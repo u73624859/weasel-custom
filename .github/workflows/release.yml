@@ -1,0 +1,52 @@
+name: Build and Release
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout this repository
+        uses: actions/checkout@v4
+        with:
+          path: this-repo
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Check if 'latest' tag exists
+        id: check-tag
+        run: |
+          cd this-repo
+          if git rev-parse -q --verify "refs/tags/latest" > /dev/null; then
+            git tag -d latest
+            git push origin --delete latest
+          else
+            echo "The 'latest' tag does not exist."
+          fi
+          cd ..
+
+      - name: Checkout the source repository
+        uses: actions/checkout@v4
+        with:
+          repository: iDvel/rime-ice
+          path: source-repo
+          fetch-depth: 1
+
+      - name: Merge files from repositories
+        run: |
+          mkdir -p release
+          cp -r source-repo/* release/
+          cp -r this-repo/* release/
+          zip -r release.zip release/
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release.zip
+          tag_name: latest
+          name: Latest Release
+          body: "This is the latest release containing files from both repositories."
