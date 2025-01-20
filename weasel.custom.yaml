@@ -11,6 +11,7 @@ patch:
     powershell.exe: { ascii_mode: true }
     powertoys.powerlauncher.exe: { ascii_mode: true }
     windowsterminal.exe: { ascii_mode: true }
+    cyberpunk2077.exe: { ascii_mode: true }
   "preset_color_schemes/example":
     author: example
     back_color: 0xF9F9F9
